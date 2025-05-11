@@ -1,0 +1,6 @@
+streamlit
+python-dateutil
+pytz
+requests
+google-generativeai
+streamlit-option-menu
