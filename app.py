@@ -7,6 +7,7 @@ from datetime import datetime, time
 from dateutil import parser
 from streamlit_option_menu import option_menu
 
+
 # Page configuration
 st.set_page_config(page_title="Email Meeting Assistant", layout="wide")
 
@@ -124,10 +125,12 @@ def main():
         available_hours = {}
         for day in days:
             with st.expander(day):
-                col1, col2, col3 = st.columns([1, 2, 2])
+                # Fixed layout with appropriate column widths to prevent text wrapping
+                col1, col2, col3 = st.columns([0.8, 1.1, 1.1])
                 
                 with col1:
-                    enabled = st.checkbox("Active", value=st.session_state.available_hours[day]["enabled"], key=f"enable_{day}")
+                    # Use a narrower label to prevent wrapping
+                    enabled = st.checkbox("On", value=st.session_state.available_hours[day]["enabled"], key=f"enable_{day}")
                 
                 with col2:
                     start_time = st.time_input("From", 
