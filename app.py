@@ -2,16 +2,19 @@ import streamlit as st
 import pytz
 import json
 import requests
-import google.generativeai as genai
 from datetime import datetime, time
 from dateutil import parser
 from streamlit_option_menu import option_menu
+
+# Import LangChain components
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.schema import HumanMessage
 
 
 # Page configuration
 st.set_page_config(page_title="Email Meeting Assistant", layout="wide")
 
-# Configure Google Generative AI
+# Configure Google Generative AI with LangChain
 def configure_genai():
     # You should use environment variables or Streamlit secrets for API keys in production
     api_key = st.secrets.get("GOOGLE_API_KEY", "")
@@ -20,11 +23,12 @@ def configure_genai():
         api_key = st.text_input("Enter Google API Key:")
     
     if api_key:
-        genai.configure(api_key=api_key)
+        # Instead of configuring genai, we'll store the API key for LangChain to use
+        st.session_state.google_api_key = api_key
         return True
     return False
 
-# Function to analyze email with Gemini
+# Function to analyze email with Gemini using LangChain
 def analyze_email(email_content, timezone, available_hours):
     try:
         # Create a prompt for the LLM with the modified format
@@ -54,11 +58,19 @@ def analyze_email(email_content, timezone, available_hours):
         Do not include any other text before or after the JSON.
         """
         
-        # Use the current supported model
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content(prompt)
+        # Use LangChain with Gemini model
+        llm = ChatGoogleGenerativeAI(
+            model="gemini-1.5-flash",
+            google_api_key=st.session_state.google_api_key,
+            temperature=0
+        )
         
-        return response.text
+        # Create a message and get the response
+        message = HumanMessage(content=prompt)
+        response = llm.invoke([message])
+        
+        # Extract the text from the response
+        return response.content
     except Exception as e:
         st.error(f"Error analyzing email: {str(e)}")
         return json.dumps({"action": "No Action"})

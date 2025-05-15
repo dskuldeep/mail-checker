@@ -3,4 +3,6 @@ python-dateutil
 pytz
 requests
 google-generativeai
+langchain
+langchain-google-genai
 streamlit-option-menu
